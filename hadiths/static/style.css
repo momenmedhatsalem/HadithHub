@@ -1,0 +1,168 @@
+.hadith {
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f9f9f9;
+  }
+
+  .hadith p {
+    margin: 0;
+  }
+
+  /* Add your custom styles here */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .hadith {
+    margin-bottom: 36px;
+  }
+
+  .hadith p {
+    font-size: 18px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .hadith hr {
+    margin: 8px 0;
+  }
+
+  .progress {
+    height: 20px;
+    background-color: #ddd;
+    margin-bottom: 20px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background-color: #4CAF50;
+    width: 0%;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .button {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+    background-color: #4CAF50;
+  }
+
+  .button:hover {
+    background-color: #3e8e41;
+  }
+
+  .disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  /* create account / login page*/
+  .messages li {
+    list-style-type: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    color: white;
+}
+
+.messages li.error {
+    background-color: #f44336;
+}
+
+.messages li.success {
+    background-color: #4CAF50;
+}
+
+.messages li.info {
+    background-color: #2196F3;
+}
+
+.messages li.warning {
+    background-color: #ff9800;
+}
+/* Layout */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+  }
+  footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header-container {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 10px;
+}
+
+.header-container {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 10px;
+}
+
+.brand {
+font-size: 24px;
+font-weight: bold;
+text-align: left;
+}
+
+.header-links {
+display: flex;
+}
+
+.link {
+color: white;
+margin-left: 10px;
+border: 2px solid white;
+border-radius: 50px;
+padding: 5px;
+white-space: nowrap;
+}
+html, body {
+height: 100%;
+}
+
+body {
+display: flex;
+flex-direction: column;
+}
+
+.container {
+flex: 1;
+}

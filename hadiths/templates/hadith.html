@@ -1,0 +1,174 @@
+{% extends "layout.html" %}
+{% load static %}
+{% load social_share %}
+{% block title %}
+
+Hadith
+{% endblock %}
+{% block content %}
+<style>
+
+</style>
+
+<header>
+  <h1>Hadiths</h1>
+</header>
+{%if search_query %}
+<input id="searchResult" hidden value="{{search_query}}">
+<h2>Search Results</h2>
+{% elif source %}
+<h3>-{{source}}-</h3>
+<div class="container">
+{% if user.is_authenticated %}
+  <!-- User is logged in, display user-specific content here -->
+  <div class="progress">
+    <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}"
+      aria-valuemin="0" aria-valuemax="100">
+      <span style="color: red">{{ progress }}%</span>
+    </div>
+  </div>
+{% else %}
+  <!-- User is not logged in, display login prompt -->
+  <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;">
+    Please <a href="{% url 'login' %}">log in</a> to keep track of your progress.
+  </div>
+  
+  {% endif %}
+  <hr/ >
+
+  {% endif %}
+
+  {% for hadith in page_obj %}
+  <div class="hadith" data-hadith_id="{{ hadith.hadith_id }}" data-source="{{source}}">
+    {% if hadith.hadith_id in read %}
+    <p title="Read" style="color: yellow; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">✔</p>
+    {% endif %}
+    <p class="text_ar" style="text-align: right;" dir="rtl">{{ hadith.hadith_no }}. {{ hadith.text_ar }}</p>
+    <br>
+    <hr />
+    <p class="text_en">{{ hadith.hadith_no }}. {{ hadith.text_en }}</p>
+    <hr />
+    <!-- Share button -->
+
+    <button onclick="shareImage('{{ hadith.get_absolute_url }}')">Share</button>
+
+
+    <!-- Download button -->
+    <a href="{% url 'hadith_image' hadith.hadith_id %}" download="hadith.png">
+      <button>Download</button>
+    </a>
+  </div>
+  {% endfor %}
+
+
+
+</div>
+{% if day != 'true'%}
+<div class="pagination">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}" class="button previous">previous</a>
+  {% else %}
+  <a class="button previous disabled">previous</a>
+  {% endif %}
+  <a href="?page={{ page_obj.number|add:1 }}&search={{ search_query }}" class="button skip"
+    data-hadith_id="{{ page_obj.id }}">skip</a>
+
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" class="button next"
+    data-hadith_id="{{ page_obj.id }}">next ✓</a>
+  {% endif %}
+</div>
+{% endif %}
+
+
+
+</div>
+<script>
+  // Get next button element
+  var nextButton = document.querySelector('.next');
+  // Get the hadith element
+  var hadithElement = document.querySelector('.hadith');
+
+  // Get the hadith ID from the data-hadith_id attribute
+  var hadith_id = hadithElement.getAttribute('data-hadith_id');
+  var source = hadithElement.getAttribute('data-source');
+  // Add click event listener
+  if (nextButton) {
+
+    nextButton.addEventListener('click', function () {
+      // Send AJAX request to server using fetch
+      fetch(`/update_progress/${hadith_id}/${source}/`)
+        .then(response => response.json())
+        .then(data => console.log(data));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    formatText('text_ar');
+    formatText('text_en');
+  });
+
+  function formatText(className) {
+    // Get elements by class name
+    var elements = document.getElementsByClassName(className);
+    var searchQuery = document.getElementById('searchResult');
+    if (searchQuery) {
+      searchQueryvalue = document.getElementById('searchResult').value;
+
+    }
+
+    // Loop through elements
+    for (var i = 0; i < elements.length; i++) {
+      // Get element
+      var element = elements[i];
+
+      // Get text from element
+      var text = element.textContent;
+
+      // Split text into parts
+      var parts = text.split('"');
+
+      // Format parts
+      for (var j = 0; j < parts.length; j++) {
+        if (j % 2 == 1) {
+          parts[j] = '<strong>" ' + parts[j] + ' "</strong>';
+        }
+      }
+
+      // Join parts
+      var formattedText = parts.join('');
+
+      // Highlight search query
+      if (searchQuery) {
+        var re = new RegExp(searchQueryvalue, 'gi');
+        formattedText = formattedText.replace(re, '<span style="color: red;">$&</span>');
+      }
+
+      // Update element
+      element.innerHTML = formattedText;
+    }
+  }
+
+
+
+  function shareImage(url) {
+    // Check if the Web Share API is supported
+    if (navigator.share) {
+      navigator.share({
+        title: 'Hadith',
+        text: 'Check out this Hadith!',
+        url: url,
+      })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing:', error));
+    } else {
+      alert('Web Share API not supported');
+    }
+  }
+
+
+
+</script>
+
+
+{% endblock %}

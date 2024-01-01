@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+{% block title %}
+
+Hadith of the day
+{% endblock %}
+
+{% block content %}
+<style>
+    .hadith-of-the-day {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.hadith-of-the-day h2 {
+    margin-top: 0;
+}
+
+.hadith-of-the-day blockquote {
+    font-size: 1.2em;
+    margin: 20px 0;
+}
+
+.hadith-of-the-day .source {
+    text-align: right;
+    font-style: italic;
+}
+
+</style>
+<div class="hadith-of-the-day">
+    
+    <blockquote>
+        {{ hadith.text_ar|linebreaks }}
+    </blockquote>
+    <hr/ >
+    <blockquote>
+        {{ hadith.text_en|linebreaks }}
+    </blockquote>
+    <p class="source">
+        Source: {{ hadith.source.name }}
+    </p>
+</div>
+{% endblock %}

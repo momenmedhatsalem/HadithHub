@@ -1,0 +1,83 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <style>
+    form {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+input[type="text"] {
+    flex-grow: 1;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+}
+
+button[type="submit"] {
+    padding: 0.5rem 1rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #3e8e41;
+}
+
+    .source-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .source-list li {
+      width: 200px;
+      height: 100px;
+      margin: 10px;
+      border-radius: 50px;
+      background-color: #4CAF50;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .hadith-of-the-day-link {
+    text-align: center;
+    margin: 20px;
+}
+
+.hadith-of-the-day-link a {
+    color: #333;
+    text-decoration: none;
+}
+
+.hadith-of-the-day-link a:hover {
+    color: #555;
+}
+
+  </style>
+  <form method="GET" action="{% url 'hadith' 'x' %}">
+    {% csrf_token %}
+    <input type="text" name="search" value="{{ search_query }}" placeholder="Search Hadiths">
+    <button type="submit">Search</button>
+</form>
+<div class="hadith-of-the-day-link">
+  <a href="{% url 'hadith' 'y' %}">
+      <h3>📜 Hadith of the Day</h3>
+  </a>
+</div>
+
+  <h2>Sources</h2>
+  <ul class="source-list">
+    {% for source in sources %}
+      <a href="{% url 'hadith' source %}"><li>-{{ source }}-</li></a>
+    {% endfor %}
+  </ul>
+{% endblock %}

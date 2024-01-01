@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+{% block title %}
+
+Profile
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <h1 class="my-4">{{ username }}'s Profile</h1>
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Source</th>
+                    <th>Hadiths Read</th>
+                    <th>Reset Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stat in source_stats %}
+                    <tr>
+                        <td><a href="{% url 'hadith' stat.source.name %}">{{ stat.source.name }}</a></td>
+                        <td>{{ stat.hadiths_read }}</td>
+                        <td>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="source_id" value="{{ stat.source.id }}">
+                                <button type="submit" class="btn btn-danger">Reset</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Bootstrap CSS -->
+
+
+    <!-- Add custom CSS styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-size: 36px;
+        }
+        .table {
+            width: 80%;
+            margin: 0 auto;
+        }
+    </style>
+{% endblock %}

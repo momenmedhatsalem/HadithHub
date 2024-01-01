@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% block title %}
+Login
+{% endblock %}
+{% block content %}
+  <style>
+    input[type=text], input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input[type=text]:focus, input[type=password]:focus {
+      border: 2px solid #4CAF50;
+    }
+
+    button[type=submit] {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button[type=submit]:hover {
+      background-color: #45a049;
+    }
+    
+ 
+    
+  </style>
+  
+  <h2>Login</h2>
+  
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+  </form>
+  
+  <p>Don't have an account? <a href="{% url 'create_account' %}">Create one now</a>.</p>
+{% endblock %}
