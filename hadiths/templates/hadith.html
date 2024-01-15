@@ -11,15 +11,20 @@ Hadith
 </style>
 
 <header>
+  {% if day %}
+  <h1>Hadith of The Day</h1>
+
+  {% else %}
   <h1>Hadiths</h1>
+  {% endif %}
 </header>
+<div class="container">
 {%if search_query %}
 <input id="searchResult" hidden value="{{search_query}}">
 <h2>Search Results</h2>
 {% elif source %}
 <h3>-{{source}}-</h3>
-<div class="container">
-{% if user.is_authenticated %}
+  {% if user.is_authenticated %}
   <!-- User is logged in, display user-specific content here -->
   <div class="progress">
     <div class="progress-bar" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}"
@@ -27,14 +32,14 @@ Hadith
       <span style="color: red">{{ progress }}%</span>
     </div>
   </div>
-{% else %}
+  {% else %}
   <!-- User is not logged in, display login prompt -->
   <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px;">
     Please <a href="{% url 'login' %}">log in</a> to keep track of your progress.
   </div>
-  
+
   {% endif %}
-  <hr/ >
+  <hr />
 
   {% endif %}
 
@@ -70,8 +75,11 @@ Hadith
   {% else %}
   <a class="button previous disabled">previous</a>
   {% endif %}
+  {% if not search_query and user.is_authenticated %}
+
   <a href="?page={{ page_obj.number|add:1 }}&search={{ search_query }}" class="button skip"
     data-hadith_id="{{ page_obj.id }}">skip</a>
+  {% endif %}
 
   {% if page_obj.has_next %}
   <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}" class="button next"
