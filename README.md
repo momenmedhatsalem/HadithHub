@@ -20,7 +20,7 @@ Welcome to Hadith Hub, a web application designed to enrich your experience in r
 ## Pages
 
 ### Home Page
-![Home Page](images/Home.png)
+![Home Page](images/Home_page.png)
 
 ### Hadith View (Before Login) Page
 ![Hadith View (Before Login)](images/Hadith_page.png)
