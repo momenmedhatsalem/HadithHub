@@ -16,6 +16,34 @@ Welcome to Hadith Hub, a web application designed to enrich your experience in r
 - **profile:** View information about your profile, including progress from different Hadith sources.
 - **logout:** Log out of your account securely.
 
+
+## Pages
+
+### Home Page
+![Home Page](images/Home_page.png)
+
+### Hadith View (Before Login) Page
+![Hadith View (Before Login)](images/Hadith_page.png)
+
+### Hadith View (After Login) Page
+![Hadith View (After Login)](images/Hadith_after_login.png)
+
+### Hadith Book (After Reading a Number of Hadiths) Page
+![Hadith Book (After Reading)](images/Hadith_after_reading.png)
+
+### Progress Bar
+![Progress Bar](images/Progress_bar.png)
+
+### Hadith of The Day Page
+![Hadith of The Day](images/Hadith_of_the_day.png)
+
+### Search Page
+![Search Page](images/Search_page.png)
+
+### Profile Page
+![Profile Page](images/Profile_page.png)
+
+
 ## Distinctiveness and Complexity
 
 Hadith Hub stands out as a distinctive and complex project due to its unique approach to interacting with Hadiths. The application not only allows users to track their progress in reading from diverse sources but also facilitates the sharing and downloading of Hadiths as images.
