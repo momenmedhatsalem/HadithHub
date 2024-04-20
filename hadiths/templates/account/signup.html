@@ -1,0 +1,70 @@
+{% extends 'layout.html' %} {% load static %} {% block title %} Create Account
+{% endblock %} {% block content %}
+<style>
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+  }
+  input[type="email"] {
+    display: none;
+  }
+  label[for="id_email"] {
+    display: none;
+  }
+
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="email"]:focus {
+    border: 2px solid #4caf50;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    background-color: #4caf50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #45a049;
+  }
+  .errorlist {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .errorlist li {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+    border: 1px solid #f5c6cb; /* Red border */
+    border-radius: 4px;
+  }
+</style>
+
+<h2>Create an account</h2>
+
+{% if messages %}
+<ul class="messages">
+  {% for message in messages %} {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %} 
+  {{ form.as_p }}
+  <button type="submit">Sign up</button>
+</form>
+
+{% endblock %}
