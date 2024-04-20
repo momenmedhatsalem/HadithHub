@@ -7,8 +7,19 @@
     align-items: center;
     margin-bottom: 1rem;
 }
-
+    .email-update {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
 input[type="text"] {
+    flex-grow: 1;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+}
+input[type="email"] {
     flex-grow: 1;
     padding: 0.5rem;
     margin-right: 0.5rem;
@@ -24,10 +35,19 @@ button[type="submit"] {
     border-radius: 0.25rem;
     cursor: pointer;
 }
+#updateEmailBtn {
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 255, 0.719);
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
 
 button[type="submit"]:hover {
     background-color: #3e8e41;
 }
+
 
     .source-list {
       list-style: none;
@@ -61,13 +81,42 @@ button[type="submit"]:hover {
 .hadith-of-the-day-link a:hover {
     color: #555;
 }
+  .ShareContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
+  }
+  .share-button {
+    background-color: #0084ff;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+  }
+  .share-button:hover {
+    background-color: #0056b3;
+  }
+  #emailMessage {
+    display: block;
+  }
   </style>
-  <form method="GET" action="{% url 'hadith' 'x' %}">
-    {% csrf_token %}
-    <input type="text" name="search" value="{{ search_query }}" placeholder="Search Hadiths">
+<form method="get" action="{% url 'search'  %}">
+
+    <input type="text" name="q" placeholder="Search Hadiths">
     <button type="submit">Search</button>
 </form>
+{% if user_has_no_email %}
+<p id="emailMessage">Add your email to secure your account</p>
+<div class="email-update">
+            <input type="email" id="email" placeholder="Eg.: khaled@gmail.com" name="email">
+            <button id="updateEmailBtn">Update Email</button>
+          </div>
+    {% endif %}
 <div class="hadith-of-the-day-link">
   <a href="{% url 'hadith' 'y' %}">
       <h3>📜 Hadith of the Day</h3>
@@ -80,4 +129,65 @@ button[type="submit"]:hover {
       <a href="{% url 'hadith' source %}"><li>-{{ source }}-</li></a>
     {% endfor %}
   </ul>
+<div class="ShareContainer">
+<!-- Share button -->
+<button class="share-button" onclick="shareWebsite('https://momenmedhatsalem.pythonanywhere.com/')">Share شارك الموقع حتي تنال الأجر</button>
+</div>
+<script>
+  function shareWebsite(url) {
+    // Check if the Web Share API is supported
+    if (navigator.share) {
+      navigator.share({
+        title: 'Hadith',
+        text: 'Check out this Hadith website!',
+        url: url,
+      })
+        .then(() => console.log('Successful share'))
+        .catch((error) => console.log('Error sharing:', error));
+    } else {
+      alert('Web Share API not supported');
+    }
+  }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateEmailBtn = document.getElementById('updateEmailBtn');
+            const emailMessage = document.getElementById('emailMessage');
+            const emailInput = document.getElementById('email');
+
+            updateEmailBtn.addEventListener('click', function() {
+                const email = emailInput.value;
+
+                // Simple email format validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    emailMessage.textContent = 'Please enter a valid email address.';
+                    return;
+                }
+
+                fetch('/update-email/', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ email: email }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        emailMessage.textContent = "✔ " + data.message;
+                        emailInput.style.display = 'none';
+                        updateEmailBtn.style.display = 'none';
+                    } else if (data.error) {
+                        emailMessage.textContent = data.error;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    
+
+</script>
 {% endblock %}

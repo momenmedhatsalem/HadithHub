@@ -12,5 +12,6 @@ urlpatterns = [
     path('login/', views.my_login_view, name='login'),
     path('profile/', views.profile, name='profile'),
     path('logout/', views.my_logout_view, name='logout'),
-
+    path('search/', views.show_hadith, name='search'),
+    path('update-email/', views.UpdateEmailAPIView.as_view(), name='update_email'),
 ]

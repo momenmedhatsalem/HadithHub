@@ -1,8 +1,10 @@
 from django.contrib import messages
-from .models import Profile
+
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import get_user_model
+
 
 from random import choice
 from typing import List
@@ -16,7 +18,7 @@ import langid
 
 from django.core.paginator import Paginator
 
-from .models import Profile, Hadith_Read, ProfileHadith, HadithSource, Hadith, ProfileHadithSource
+from .models import  Hadith_Read, ProfileHadith, HadithSource, Hadith, ProfileHadithSource
 
 from datetime import date
 
@@ -25,15 +27,45 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 
 
+from django.shortcuts import render
+
 def index(request):
     # Load sources from database
     sources = HadithSource.objects.all().values_list('name', flat=True)
+    
+    # Check if the user is authenticated and has no email assigned
+    user_has_no_email = False
+    if request.user.is_authenticated and request.user.email == '':
+        user_has_no_email = True
+    
     # Render page
     context = {
         'sources': sources,
+        'user_has_no_email': user_has_no_email,
     }
 
     return render(request, 'index.html', context)
+
+
+from django.shortcuts import render
+from django.views.generic import TemplateView
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+class UpdateEmailAPIView(APIView):
+    def put(self, request):
+        if request.user.is_authenticated:
+            new_email = request.data.get('email', None)
+            if new_email:
+                request.user.email = new_email
+                request.user.save()
+                return Response({'message': 'Email updated successfully'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Email field is required'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 def search_hadiths(hadiths, query):
@@ -157,6 +189,7 @@ def hadith(request, source):
         hadith = hadiths[index]
         return render(request, 'hadith.html', {'page_obj': [hadith], 'day': 'true'})
     else:
+        
         hadiths = Hadith.objects.filter(source__name=source)
         per_page = 1
     # Filter hadiths based on search query
@@ -168,13 +201,13 @@ def hadith(request, source):
     user = request.user
     read_hadith_ids = []
     if user.is_authenticated and source != 'x':
-        profile, created = Profile.objects.get_or_create(user=user)
+        profile, created = get_user_model().objects.get_or_create(pk=request.user.id)
         try:
             profile_hadith_source = ProfileHadithSource.objects.get(
-                profile=profile, hadith_source__name=source)
+                user=profile, hadith_source__name=source)
             # Get the first unread Hadith
             read_hadith_ids = ProfileHadith.objects.filter(
-                profile=profile).values_list('hadith_id', flat=True)
+                user=profile).values_list('hadith_id', flat=True)
             unread_hadiths = hadiths.exclude(hadith_id__in=read_hadith_ids)
             if not page_number:
                 if unread_hadiths.exists():
@@ -188,7 +221,7 @@ def hadith(request, source):
         except ProfileHadithSource.DoesNotExist:
             hadith_source = HadithSource.objects.get(name=source)
             profile_hadith_source = ProfileHadithSource.objects.create(
-                profile=profile, hadith_source=hadith_source)
+                user=profile, hadith_source=hadith_source)
             page_number = 1
         total_hadiths = hadiths.filter(source__name=source).count()
         progress = (profile_hadith_source.hadiths_read_number /
@@ -210,31 +243,60 @@ def hadith(request, source):
     return render(request, 'hadith.html', context)
 
 
+
+import json
+import requests
+from django.shortcuts import render
+
+def show_hadith(request):
+    # Make a GET request to the API
+    query = request.GET.get("q")
+
+    response = requests.get(f"https://dorar.net/dorar_api.json?skey={query}")
+    data = response.json()
+
+    # Extract the full response text
+    full_response = data['ahadith']['result']
+
+    # Find the position of the link in the response
+    link_position = full_response.find('<a href=')
+
+    # Extract the substring before the link
+    ahadith_text = full_response[:link_position]
+
+    # Split the Ahadiths based on the delimiter
+    ahadith_results = ahadith_text.split('--------------')
+
+    # Pass the data to the template for rendering
+    return render(request, 'hadith_template.html', {'ahadith_results': ahadith_results})
+
+
+
 def update_progress(request, hadith_id, source):
     user = request.user
-    profile = Profile.objects.get(user=user)
+    profile = get_user_model().objects.get(pk=request.user.id)
     sources = HadithSource.objects.all().values_list('name', flat=True)
 
     try:
         profile_hadith_source = ProfileHadithSource.objects.get(
-            profile=profile, hadith_source__name=source)
+            user=profile, hadith_source__name=source)
     except ProfileHadithSource.DoesNotExist:
         try:
             # Create a new ProfileHadithSource object for the user if one does not already exist
             hadith_source = HadithSource.objects.get(name=source)
             profile_hadith_source = ProfileHadithSource.objects.create(
-                profile=profile, hadith_source=hadith_source)
+                user=profile, hadith_source=hadith_source)
         except HadithSource.DoesNotExist:
             return JsonResponse({'message': 'The specified Hadith source does not exist.'})
 
     # Check if the user has already read the hadith
     hadith = Hadith.objects.get(hadith_id=hadith_id)
-    if not ProfileHadith.objects.filter(profile=profile, hadith=hadith).exists():
+    if not ProfileHadith.objects.filter(user=profile, hadith=hadith).exists():
         # Update the progress only if the user has not already read the hadith
         profile_hadith_source.hadiths_read_number += 1
         profile_hadith_source.save()
         # Create a new ProfileHadith object to keep track of the hadith that the user has read
-        ProfileHadith.objects.create(profile=profile, hadith=hadith)
+        ProfileHadith.objects.create(user=profile, hadith=hadith)
 
     return JsonResponse({'message': 'Progress updated'})
 
@@ -279,7 +341,7 @@ def my_create_account_view(request):
         if form.is_valid():
             user = form.save()
             # Create a Profile object for the new user
-            profile = Profile.objects.create(user=user)
+            profile = get_user_model().objects.create(user=user)
             login(request, user)
             return redirect('/')
     else:
@@ -287,34 +349,57 @@ def my_create_account_view(request):
     return render(request, 'create_account.html', {'form': form})
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+
+from .models import ProfileHadithSource, ProfileHadith
+
 @login_required
 def profile(request):
-    profile = Profile.objects.get(user=request.user)
+    # Fetch the user's profile using request.user.profile
+    profile = request.user
+    # Get all sources associated with the user
     sources = profile.sources.all()
     source_stats = []
+    # Iterate over each source and fetch related stats
     for source in sources:
-        phs = ProfileHadithSource.objects.get(
-            profile=profile, hadith_source=source)
-        source_stats.append({
-            'source': source,
-            'hadiths_read': phs.hadiths_read_number
-        })
+        try:
+            phs = ProfileHadithSource.objects.get(user=profile, hadith_source=source)
+            source_stats.append({
+                'source': source,
+                'hadiths_read': phs.hadiths_read_number
+            })
+        except ProfileHadithSource.DoesNotExist:
+            # Handle the case where there is no ProfileHadithSource for the user and source
+            # You might want to set a default value for 'hadiths_read' here
+            source_stats.append({
+                'source': source,
+                'hadiths_read': 0
+            })
+
     if request.method == 'POST':
         source_id = request.POST.get('source_id')
         if source_id:
-            phs = ProfileHadithSource.objects.get(
-                profile=profile, hadith_source_id=source_id)
-            phs.hadiths_read_number = 0
-            phs.save()
-            # Delete all ProfileHadith objects associated with the user's profile and Hadiths from that source
-            ProfileHadith.objects.filter(
-                profile=profile, hadith__source_id=source_id).delete()
-            return redirect('profile')
+            try:
+                phs = ProfileHadithSource.objects.get(user=profile, hadith_source_id=source_id)
+                phs.hadiths_read_number = 0
+                phs.save()
+                # Delete all ProfileHadith objects associated with the user's profile and Hadiths from that source
+                ProfileHadith.objects.filter(user=profile, hadith__source_id=source_id).delete()
+            except ProfileHadithSource.DoesNotExist:
+                pass  # Handle the case where ProfileHadithSource doesn't exist
+
+            # Redirect to the profile page after the POST request
+            return redirect(reverse('profile'))
+
     context = {
         'username': request.user.username,
         'source_stats': source_stats,
     }
     return render(request, 'profile.html', context)
+
 
 
 @login_required

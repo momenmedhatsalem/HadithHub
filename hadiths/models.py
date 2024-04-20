@@ -1,16 +1,18 @@
 from django.db import models
-from django.contrib.auth.models import User
+
 from django.urls import reverse
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 class HadithSource(models.Model):
     name = models.CharField(max_length=255)
 
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class User(AbstractUser):
     sources = models.ManyToManyField(HadithSource, through='ProfileHadithSource')
 
 class ProfileHadithSource(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     hadith_source = models.ForeignKey(HadithSource, on_delete=models.CASCADE)
     hadiths_read_number = models.IntegerField(default=0)
 
@@ -35,5 +37,5 @@ class Hadith(models.Model):
 
 
 class ProfileHadith(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     hadith = models.ForeignKey(Hadith, on_delete=models.CASCADE)
