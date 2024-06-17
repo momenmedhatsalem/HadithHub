@@ -62,6 +62,13 @@ Hadith
     <a href="{% url 'hadith_image' hadith.hadith_id %}" download="hadith.png">
       <button>Download</button>
     </a>
+    {% if day == 'true' %}
+{% for hadith in page_obj %}
+    <p class="source">
+        Source: {{ hadith.source.name }}
+    </p>
+    {% endfor %}
+{% endif %}
   </div>
   {% endfor %}
 
@@ -86,6 +93,7 @@ Hadith
     data-hadith_id="{{ page_obj.id }}">next ✓</a>
   {% endif %}
 </div>
+
 {% endif %}
 
 

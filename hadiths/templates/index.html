@@ -110,7 +110,7 @@ button[type="submit"]:hover {
     <input type="text" name="q" placeholder="Search Hadiths">
     <button type="submit">Search</button>
 </form>
-{% if user_has_no_email %}
+{% if user.is_authenticated and not user.email %}
 <p id="emailMessage">Add your email to secure your account</p>
 <div class="email-update">
             <input type="email" id="email" placeholder="Eg.: khaled@gmail.com" name="email">

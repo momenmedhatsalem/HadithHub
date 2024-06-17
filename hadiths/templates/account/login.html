@@ -4,16 +4,17 @@ Login
 {% endblock %}
 {% block content %}
   <style>
-    input[type=text], input[type=password] {
+    input[type=email], input[type=password] {
       width: 100%;
       padding: 12px 20px;
       margin: 8px 0;
       box-sizing: border-box;
       border: 2px solid #ccc;
       border-radius: 4px;
+      display: block;
     }
 
-    input[type=text]:focus, input[type=password]:focus {
+    input[type=email]:focus, input[type=password]:focus {
       border: 2px solid #4CAF50;
     }
 
@@ -41,7 +42,7 @@ Login
   
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form }}
     <button type="submit">Login</button>
   </form>
   

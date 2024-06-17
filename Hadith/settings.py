@@ -62,7 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'Hadith.urls'
@@ -78,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+ 
             ],
         },
     },
@@ -135,7 +136,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+SITE_NAME = 'HadithHub'
 # django-allauth config
 SITE_ID = 1
 AUTHENTICATION_BACKENDS = (
@@ -148,10 +149,23 @@ LOGOUT_REDIRECT_URL = "index"
 ACCOUNT_SESSION_REMEMBER = True 
 ACCOUNT_LOGIN_TEMPLATE = 'hadiths/templates/account/login.html'
 ACCOUNT_SIGNUP_TEMPLATE = 'hadiths/templates/account/signup.html'
-ACCOUNT_USERNAME_REQUIRED = True # new
-ACCOUNT_AUTHENTICATION_METHOD = "username" # new
-ACCOUNT_SIGNUP_EMAIL_REQUIRED = True # new
+ACCOUNT_USERNAME_REQUIRED = False # new
+ACCOUNT_AUTHENTICATION_METHOD = "email" # new
 ACCOUNT_EMAIL_REQUIRED = True # new
-ACCOUNT_UNIQUE_EMAIL = False #
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_SIGNUP_EMAIL_REQUIRED = True # new
+ACCOUNT_UNIQUE_EMAIL = True #
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_CHANGE_EMAIL = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+# email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'hadithhubteam@gmail.com'
+EMAIL_HOST_PASSWORD = 'mhlw pvoo kpud ilwe'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "HadithHub, "
