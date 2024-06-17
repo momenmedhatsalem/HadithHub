@@ -1,0 +1,107 @@
+
+{% load i18n %}
+{% load account %}
+{% load allauth %}
+
+{% block content %}
+    <style>
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content h1 {
+            color: #333333;
+        }
+        .content p {
+            color: #555555;
+            line-height: 1.6;
+        }
+        .button-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .confirm-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        .confirm-button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            background-color: #f4f4f4;
+            color: #888888;
+            padding: 10px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+
+    <div class="container">
+        <div class="header">
+            <h1>{% trans "Confirm Email Address" %}</h1>
+        </div>
+        <div class="content">
+            {% if confirmation %}
+                {% user_display confirmation.email_address.user as user_display %}
+                {% if can_confirm %}
+                    <p>
+                        {% blocktrans with confirmation.email_address.email as email %}
+                            Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.
+                        {% endblocktrans %}
+                    </p>
+                    {% url 'account_confirm_email' confirmation.key as action_url %}
+                    <div class="button-container">
+                        <form method="post" action="{{ action_url }}">
+                            {% csrf_token %}
+                            {{ redirect_field }}
+                            <button type="submit" class="confirm-button">
+                                {% trans "Confirm" %}
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p>
+                        {% blocktrans %}
+                            Unable to confirm {{ email }} because it is already confirmed by a different account.
+                        {% endblocktrans %}
+                    </p>
+                {% endif %}
+            {% else %}
+                {% url 'account_email' as email_url %}
+                <p>
+                    {% blocktrans %}
+                        This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.
+                    {% endblocktrans %}
+                </p>
+            {% endif %}
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 HadithHub. All rights reserved.</p>
+        </div>
+    </div>
+{% endblock content %}
